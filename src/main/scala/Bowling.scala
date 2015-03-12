@@ -7,14 +7,21 @@ class Bowling {
       case x => NormalThrow(x.asDigit)
     });
 
-   throws.foldLeft((0, List[Throw]()))((result: (Int, List[Throw]), currentThrow: Throw) =>
-      result._2 match {
-        case Nil => (result._1 + currentThrow.value, List(currentThrow))
-        case h1 :: h2 :: tail if h2 == Strike() => (result._1 + currentThrow.value + (currentThrow.value + h1.value), currentThrow :: result._2)
-        case h1 :: h2 :: tail if h1 == Spare() => (result._1 + currentThrow.value + currentThrow.value - h2.value, currentThrow :: result._2)
-        case h :: tail => (result._1 + currentThrow.value, currentThrow :: result._2)
-      }
-   )._1
+   throws.foldLeft((0, List[Throw]()))((result: (Int, List[Throw]), currentThrow: Throw) => {
+     if (result._2.size < throws.size - 1) {
+       result._2 match {
+         case Nil => (result._1 + currentThrow.value, List(currentThrow))
+         case h1 :: h2 :: tail if h2 == Strike() => (result._1 + 2 * currentThrow.value + h1.value, currentThrow :: result._2)
+         case h1 :: h2 :: tail if h1 == Spare() => (result._1 + 2 * currentThrow.value - h2.value, currentThrow :: result._2)
+         case h :: tail => (result._1 + currentThrow.value, currentThrow :: result._2)
+       }
+     } else {
+       result._2 match {
+         case h1 :: h2 :: tail if h1 == Spare() => (result._1  + currentThrow.value - h2.value, currentThrow :: result._2)
+         case h :: tail => (result._1 + currentThrow.value, currentThrow :: result._2)
+       }
+     }
+   })._1
   }
 }
 
